@@ -1,0 +1,124 @@
+type Value = 
+ variant {
+   "bool": bool;
+   float: float64;
+   "int": int;
+   "nat": nat;
+   "null";
+   "text": text;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type ScoreFactors = 
+ record {
+   activities: nat;
+   cost: nat;
+   crowd: nat;
+   traffic: nat;
+   weather: nat;
+ };
+type Result__1 = 
+ variant {
+   err: Error;
+   ok;
+ };
+type Result = 
+ record {
+   hasMore: bool;
+   rows: vec vec Cell;
+ };
+type Error = 
+ variant {
+   AmbiguousAttribute: record {
+                         field: text;
+                         sources: vec text;
+                       };
+   FrontendOriginMismatch: record {
+                             expected: vec text;
+                             got: text;
+                           };
+   FrontendOriginsNotConfigured;
+   MalformedCandid;
+   MissingField: text;
+   MixedSsoSources: record {
+                      otherKeys: vec text;
+                      ssoKeys: vec text;
+                    };
+   NoAttributes;
+   Stale: record {ageNs: nat;};
+   UnknownNonce;
+   UntrustedSsoSource: record {domain: text;};
+ };
+type Destination = 
+ record {
+   alternatives: vec nat;
+   bestTimeToVisit: BestTimeToVisit;
+   budget: BudgetEstimate;
+   category: Category;
+   coordinates: Coordinates;
+   country: text;
+   crowdLevel: CrowdLevel;
+   description: text;
+   id: nat;
+   imageUrl: text;
+   name: text;
+   score: nat;
+   scoreFactors: ScoreFactors;
+ };
+type CrowdLevel = 
+ variant {
+   high;
+   low;
+   medium;
+ };
+type Coordinates = 
+ record {
+   lat: float64;
+   lng: float64;
+ };
+type Cell = 
+ record {
+   name: text;
+   value: Value;
+ };
+type Category = 
+ variant {
+   attraction;
+   beach;
+   city;
+   country;
+   mountain;
+ };
+type BudgetEstimate = 
+ record {
+   activities: nat;
+   food: nat;
+   hotel: nat;
+   total: nat;
+   transport: nat;
+ };
+type BestTimeToVisit = 
+ record {
+   bestDays: vec text;
+   bestMonths: vec nat;
+   reason: text;
+ };
+service : {
+  _initialize_access_control: () -> ();
+  _internet_identity_sign_in_finish: () -> (Result__1);
+  _internet_identity_sign_in_start: () -> (blob);
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  execute: (qJson: text) -> (Result) query;
+  getApiDoc: () -> (text) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getDestination: (id: nat) -> (opt Destination) query;
+  isCallerAdmin: () -> (bool) query;
+  listDestinations: () -> (vec Destination) query;
+  schema: () -> (text) query;
+  searchDestinations: (searchTerm: text, category: opt Category) ->
+   (vec Destination) query;
+}
